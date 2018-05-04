@@ -1,4 +1,5 @@
 import binarize
+from constants import *
 
 import argparse
 import pickle
@@ -27,9 +28,7 @@ PATH_MODEL = "models/model.h5"
 PATH_VOCAB = "models/vocab"
 PATH_ID2VOCAB = "models/id2vocab"
 
-alph = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.,:;'*!?`$%&(){}[]-/\@_#"
-
-def load_obj(name ):
+def load_obj(name):
     with open(name + '.pkl', 'rb') as f:
         return pickle.load(f)
 
@@ -39,13 +38,13 @@ id2vocab = load_obj(PATH_ID2VOCAB)
 text_cleaned = open(PATH_FILE).read().replace('\n', ' <eos>').lower().strip().split()
 
 def vectorize_data(vec_cleaned, data_name): # training, dev, or test
-    X_vec = np.zeros((int(len(vec_cleaned)/batchsize), batchsize, len(alph)*3), dtype=np.bool)
+    X_vec = np.zeros((int(len(vec_cleaned)/batchsize), batchsize, data_dim), dtype=np.bool)
     X_token = []
     # easy minibatch
     # https://docs.python.org/2.7/library/functions.html?highlight=zip#zip
     for m, mini_batch_tokens in enumerate(zip(*[iter(vec_cleaned)]*batchsize)):
         X_token_m = []
-        x_mini_batch = np.zeros((batchsize, len(alph)*3), dtype=np.bool)
+        x_mini_batch = np.zeros((batchsize, data_dim), dtype=np.bool)
         for j, token in enumerate(mini_batch_tokens):
             x_mini_batch[j], x_token = binarize.noise_char(token, "No noise", alph)
             X_token_m.append(x_token)

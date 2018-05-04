@@ -12,6 +12,8 @@ import csv
 import pickle
 
 import binarize
+from constants import *
+
 import h5py
 from keras.models import Sequential
 from keras.layers import Activation, Dense, Dropout, LSTM, TimeDistributed
@@ -20,7 +22,7 @@ from keras.regularizers import l1_l2
 
 ### path for data (for example)
 # DEV : validation set
-PATH_TRAIN = './data/SHORT.train.txt'
+PATH_TRAIN = './data/ptb.train.txt'
 PATH_DEV = './data/ptb.valid.txt'
 PATH_TEST = './data/ptb.test.txt'
 
@@ -39,13 +41,8 @@ parser.add_argument('--jumble', '-j', default="INT",
     help='jumble position (INT, WHOLE, BEG, or END)')
 parser.add_argument('--pilot', '-p', default=False, action='store_true',
     help='If True, results and model are not saved (Default: False)')
-parser.add_argument('--save', '-s', default=False, action='store_true',
-    help='If True, will reload data and save numpy arrays (Default: False)')
-
-alph = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.,:;'*!?`$%&(){}[]-/\@_#"
-DROPOUT_RATE_INPUT = 0.01
-DROPOUT_RATE = 0.5
-
+parser.add_argument('--saved', '-s', default=True, action='store_false',
+    help='If false, will generate data again and saved numpy arrays (Default: True)')
 
 args = parser.parse_args()
 
@@ -55,7 +52,7 @@ batchsize = args.batchsize  # minibatch size
 check_point = args.checkpoint # checkpoint (num epoch)
 noise_type = args.noise     # noise type
 is_pilot = args.pilot
-save = args.save
+saved = args.saved
 
 assert noise_type in ['JUMBLE', 'INSERT', 'DELETE', 'REPLACE', 'RANDOM', 'OCR']
 jumble_type = args.jumble   # jumble position
@@ -71,7 +68,7 @@ print("noise type:\t"  +noise_type)
 print("jumble type:\t" +jumble_type)
 print("is pilot?:\t"   +str(is_pilot))
 
-EXP_NAME = "SHORTlines_train_j-"+ jumble_type + "_n-" + noise_type + "_u-" + str(n_units) + '_batch-' + str(batchsize)
+EXP_NAME = "lines_train_j-"+ jumble_type + "_n-" + noise_type + "_u-" + str(n_units) + '_batch-' + str(batchsize)
 
 d = datetime.datetime.today()
 START_TIME =  d.strftime('%Y/%m/%d %H:%M:%S')
@@ -94,7 +91,7 @@ def colors(token, color='green'):
    c_close = '\033[0m' # close
    return c_green + token + c_close
 
-def tokenize_string(str):
+def tokenize_string(str): # Not used
     words = []
     word = ""
     for c in str:
@@ -143,7 +140,7 @@ dev_cleaned = ""
 test_data= ""
 test_cleaned =""
 
-if save:
+if saved:
     train_data, train_cleaned = load_data(PATH_TRAIN)
     dev_data, dev_cleaned = load_data(PATH_DEV)
     test_data, test_cleaned = load_data(PATH_TEST)
@@ -173,21 +170,25 @@ print('#tokens in validation:\t', len(dev_cleaned))
 
 print("===== VECTORIZING DATA =====")
 timesteps = len(train_cleaned)
-data_dim = len(alph)*3
+
+def mistake_happen():
+    return random.random() < MISTAKE_PROBABILITY
 
 def vectorize_data(vec_cleaned, data_name): # training, dev, or test
-    X_vec = np.zeros((int(len(vec_cleaned)/batchsize), batchsize, len(alph)*3), dtype=np.bool)
+    X_vec = np.zeros((int(len(vec_cleaned)/batchsize), batchsize, data_dim), dtype=np.bool)
     Y_vec = np.zeros((int(len(vec_cleaned)/batchsize), batchsize, len(vocab)), dtype=np.bool)
     X_token = []
     # easy minibatch
     # https://docs.python.org/2.7/library/functions.html?highlight=zip#zip
     for m, mini_batch_tokens in enumerate(zip(*[iter(vec_cleaned)]*batchsize)):
         X_token_m = []
-        x_mini_batch = np.zeros((batchsize, len(alph)*3), dtype=np.bool)
+        x_mini_batch = np.zeros((batchsize, data_dim), dtype=np.bool)
         y_mini_batch = np.zeros((batchsize, len(vocab)), dtype=np.bool)
 
         for j, token in enumerate(mini_batch_tokens):
-            if noise_type == 'OCR':
+            if not mistake_happen():
+                x_mini_batch[j], x_token = binarize.noise_char(token, "NO NOISE", alph)
+            elif noise_type == 'OCR':
                 rnd_noise = random.choice(['DELETE', 'INSERT', 'REPLACE', 'REPLACETABLE', 'REPLACETABLE']) #MAKE REPLACETABLE MORE PROBABLE
                 x_mini_batch[j], x_token = binarize.noise_char(token, rnd_noise, alph)
 

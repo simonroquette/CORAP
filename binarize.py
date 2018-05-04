@@ -5,6 +5,9 @@ import string
 import numpy as np
 import random
 
+from constants import *
+
+
 # ADDED_NOTE comments by SIMON ROQUETTTE, REPLACETABLE with its frame too
 
 # TODO insert space
@@ -59,7 +62,7 @@ def hasnum(w):
 
 
 # "a" = 97
-def shape_input(w) :
+def shape_input(w) : # Not used
     num = []
 
     for c in w:
@@ -74,22 +77,24 @@ def shape_input(w) :
     return np.array(num)
 
 
+
 def noise_char(w, opt, alph):
-    bin_initial = [0] * len(alph)
-    bin_middle = [0] * len(alph)
-    bin_end = [0] * len(alph)
+
+    bin = [0] * len(alph) * MAX_WORD_LENGTH
+
     if w == '<eos>':
-        bin_initial[-1] += 1
-        bin_middle[-1] += 1
-        bin_end[-1] += 1
+        for i in range(MAX_WORD_LENGTH) :
+            bin[(i+1)*len(alph) - 1] += 1
     elif w == '<unk>':
-        bin_initial[-2] += 1
-        bin_middle[-2] += 1
-        bin_end[-2] += 1
+        for i in range(MAX_WORD_LENGTH) :
+            bin[(i+1)*len(alph) - 2] += 1
     elif hasnum(w):
-        bin_initial[-3] += 1
-        bin_middle[-3] += 1
-        bin_end[-3] += 1
+        for i in range(MAX_WORD_LENGTH) :
+            bin[(i+1)*len(alph) - 3] += 1
+
+    elif not isalpha(w) and len(w) < 3: # Then it is ponctuation like "!!" ??" or ")," and we consider no noise
+        for i in len(w):
+            bin[i*len(alph) + alph.index(w[i])] += 1
 
     else:
         if opt == "DELETE":
@@ -152,18 +157,14 @@ def noise_char(w, opt, alph):
                     else:
                         del choices[idx]
 
-        for i in range(len(w)):
-            if i == 0 :
-                bin_initial[alph.index(w[i])] += 1
-            elif i == len(w) -1:
-                bin_end[alph.index(w[i])] += 1
-            else :
-                bin_middle[alph.index(w[i])] += 1
+        for i in range(min(len(w), MAX_WORD_LENGTH)): #Last letters of a word longer than MAX_WORD_LENGTH will be ignored
+        #TODO One other way could be to ignore middle ones ? Because last letters matter more (gender/plural, is more important)
+            bin[i*len(alph) + alph.index(w[i])] += 1
 
-    return np.array(bin_initial + bin_middle + bin_end), w
+    return np.array(bin), w
 
 
-def jumble_char(w, opt, alph):
+def jumble_char(w, opt, alph): #Not adapted new version
     if opt == "WHOLE":
         bin_all = [0] * len(alph)
         bin_filler = [0] * (len(alph) * 2)
@@ -281,7 +282,6 @@ def jumble_char(w, opt, alph):
 
 
 if __name__ == "__main__":
-    alph = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.,:;'*!?`$%&(){}[]-/\@_#"
     word = 'research'
     print(word)
     v, w = noise_char(word, 'DELETE', alph)
