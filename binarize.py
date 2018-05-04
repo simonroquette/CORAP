@@ -92,7 +92,7 @@ def noise_char(w, opt, alph):
         for i in range(MAX_WORD_LENGTH) :
             bin[(i+1)*len(alph) - 3] += 1
 
-    elif not isalpha(w) and len(w) < 3: # Then it is ponctuation like "!!" ??" or ")," and we consider no noise
+    elif not isalpha(w) and len(w) < 3: # Then it is ponctuation like "!" "??" or ")," and we consider no noise
         for i in len(w):
             bin[i*len(alph) + alph.index(w[i])] += 1
 
