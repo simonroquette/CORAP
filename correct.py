@@ -13,7 +13,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--file', '-f', default="data/errors.txt",
     help='Path of file to correct, default errors.txt')
 parser.add_argument('--mute', '-m', default=False, action='store_true',
-    help='If True, results will not be printed in the console')
+    help='If True, results will not be printed in the console (Default = False)')
 parser.add_argument('--batchsize', '-b', type=int, default=20,
     help='learning minibatch size')
 
@@ -24,7 +24,7 @@ batchsize = args.batchsize
 
 PATH_CORRECTION = "correction.txt"
 
-PATH_MODEL = "models/model.h5"
+PATH_MODEL = "models/model_92%.h5"
 PATH_VOCAB = "models/vocab"
 PATH_ID2VOCAB = "models/id2vocab"
 

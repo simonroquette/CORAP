@@ -171,9 +171,6 @@ print('#tokens in validation:\t', len(dev_cleaned))
 print("===== VECTORIZING DATA =====")
 timesteps = len(train_cleaned)
 
-def mistake_happen():
-    return random.random() < MISTAKE_PROBABILITY
-
 def vectorize_data(vec_cleaned, data_name): # training, dev, or test
     X_vec = np.zeros((int(len(vec_cleaned)/batchsize), batchsize, data_dim), dtype=np.bool)
     Y_vec = np.zeros((int(len(vec_cleaned)/batchsize), batchsize, len(vocab)), dtype=np.bool)
