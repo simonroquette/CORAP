@@ -12,6 +12,8 @@ from keras.optimizers import SGD
 parser = argparse.ArgumentParser()
 parser.add_argument('--file', '-f', default="data/errors.txt",
     help='Path of file to correct, default errors.txt')
+parser.add_argument('--text', '-t', default="",
+    help='Use this option to correct the specified text')
 parser.add_argument('--mute', '-m', default=False, action='store_true',
     help='If True, results will not be printed in the console (Default = False)')
 parser.add_argument('--batchsize', '-b', type=int, default=20,
@@ -21,6 +23,7 @@ args = parser.parse_args()
 PATH_FILE = args.file #default is "errors.txt"
 MUTE = args.mute
 batchsize = args.batchsize
+text = args.text
 
 PATH_CORRECTION = "correction.txt"
 
@@ -35,7 +38,12 @@ def load_obj(name):
 vocab = load_obj(PATH_VOCAB)
 id2vocab = load_obj(PATH_ID2VOCAB)
 
-text_cleaned = open(PATH_FILE).read().replace('\n', ' <eos>').lower().strip().split()
+text_cleaned = ""
+
+if text == "":
+    text_cleaned = open(PATH_FILE).read().replace('\n', ' <eos>').lower().strip().split()
+else :
+    text_cleaned = text.replace('\n', ' <eos>').lower().strip().split()
 
 def vectorize_data(vec_cleaned, data_name): # training, dev, or test
     X_vec = np.zeros((int(len(vec_cleaned)/batchsize), batchsize, data_dim), dtype=np.bool)
@@ -82,7 +90,7 @@ for j in range(len(X_test)):
     if not MUTE:
         print("src : ", src_j)
         print("pred : ", pred_j)
-
-    correction.write(pred_j)
+    if text == "" :
+        correction.write(pred_j)
 
 correction.close()

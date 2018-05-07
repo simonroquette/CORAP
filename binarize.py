@@ -85,19 +85,19 @@ def noise_char(w, opt, alph):
     if w == '<eos>':
         for i in range(MAX_WORD_LENGTH) :
             bin[(i+1)*len(alph) - 1] += 1
-    elif w == '<unk>':
+    elif w == '<unk>': # Should be removed ???
+        #print("UNK here !!!!!!!!!!!!!!")
         for i in range(MAX_WORD_LENGTH) :
             bin[(i+1)*len(alph) - 2] += 1
-    elif hasnum(w):
-        for i in range(MAX_WORD_LENGTH) :
-            bin[(i+1)*len(alph) - 3] += 1
 
-    elif (not w.isalpha()) and len(w) < 3: # Then it is ponctuation like "!" "??" or ")," and we consider no noise
+    # Events with no noise here : - numbers
+    # - ponctuation like "!" "??" or "),"
+    elif hasnum(w) or ((not w.isalpha()) and len(w) < 3):
         for i in range(len(w)):
             bin[i*len(alph) + alph.index(w[i])] += 1
 
     else:
-        if opt == "DELETE":
+        if opt == "DELETE" and len(w) > 1: # Words of length 1 don't overgo deletion...
                 idx = random.randint(0, len(w) - 1)
                 w = w[:idx] + w[idx + 1:]
 
@@ -158,7 +158,7 @@ def noise_char(w, opt, alph):
                         del choices[idx]
 
         for i in range(min(len(w), MAX_WORD_LENGTH)): #Last letters of a word longer than MAX_WORD_LENGTH will be ignored
-        #TODO One other way could be to ignore middle ones ? Because last letters matter more (gender/plural, is more important)
+            #TODO One other way could be to ignore middle ones ? Because last letters matter more (gender/plural, is more important)
             bin[i*len(alph) + alph.index(w[i])] += 1
 
     return np.array(bin), w

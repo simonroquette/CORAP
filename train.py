@@ -10,6 +10,7 @@ import numpy as np
 import six
 import csv
 import pickle
+import nltk.tokenize.casual
 
 import binarize
 from constants import *
@@ -22,7 +23,7 @@ from keras.regularizers import l1_l2
 
 ### path for data (for example)
 # DEV : validation set
-PATH_TRAIN = './data/ptb.train.txt'
+PATH_TRAIN = './data/SHORT.ptb.train.txt'
 PATH_DEV = './data/ptb.valid.txt'
 PATH_TEST = './data/ptb.test.txt'
 
@@ -111,21 +112,33 @@ def tokenize_string(str): # Not used
 def load_data(filename):
     global vocab
 
-    # words are considered in a document level
-    words = open(filename).read().replace('\n', '<eos>').lower().strip().split()
-    dataset = np.ndarray((len(words),), dtype=np.int32)
+    word_counter = dict()
+    words = nltk.tokenize.casual.casual_tokenize(open(PATH_TRAIN, "r").read().replace("\n", "<eos>"), preserve_case = False)
+    for w in words:
+        if w in word_counter:
+            word_counter[w] += 1
+        else: # Words with a space cause bug
+            word_counter[w] = 1
+
     for i, word in enumerate(words):
-        if word not in vocab:
+        if word_counter[word] >= MIN_OCCURENCES and word not in vocab:
             # put one hot vector: len(vocab) as a index
             vocab[word] = len(vocab)
             id2vocab[vocab[word]] = word
             # present input data as a sequence of one-hot vector
-        dataset[i] = vocab[word]
-    return dataset, words
+
+    ID_UNKNOWN_WORD = len(vocab)
+    vocab["##&&(())!!!??"] = ID_UNKNOWN_WORD   #Used for unknown word => map to identity in decode_word
+    id2vocab[vocab["##&&(())!!!??"]] = "##&&(())!!!??"
+    return words
 
 def decode_word(X, calc_argmax):
+    print("THIS is X in decode word : ", X)
+    print("calc_argmax is set to : ", calc_argmax)
     if calc_argmax:
         X = X.argmax(axis=-1)
+        print("This is the look of X now : ", X)
+    print("This is the return : ", ' '.join(id2vocab[x] for x in X))
     return ' '.join(id2vocab[x] for x in X)
 
 
@@ -133,31 +146,21 @@ def decode_word(X, calc_argmax):
 
 # sentence is represented as id, <eos> is also represented as one word
 
-train_data = ""
 train_cleaned = ""
-dev_data = ""
 dev_cleaned = ""
-test_data= ""
 test_cleaned =""
 
 if saved:
-    train_data, train_cleaned = load_data(PATH_TRAIN)
-    dev_data, dev_cleaned = load_data(PATH_DEV)
-    test_data, test_cleaned = load_data(PATH_TEST)
-    np.savez("Train_data", train_data=train_data, train_cleaned=train_cleaned)
-    np.savez("Validation_data", dev_data=dev_data, dev_cleaned=dev_cleaned)
-    np.savez("Test_data", test_data=test_data, test_cleaned=test_cleaned)
+    train_cleaned = load_data(PATH_TRAIN)
+    dev_cleaned = load_data(PATH_DEV)
+    test_cleaned = load_data(PATH_TEST)
 
     save_obj(vocab, "vocab")
     save_obj(id2vocab, "id2vocab")
+
 else :
-    train_data = np.load("Train_data.npz")["train_data"]
     train_cleaned = np.load("Train_data.npz")["train_cleaned"]
-
-    dev_data = np.load("Validation_data.npz")["dev_data"]
     dev_cleaned = np.load("Validation_data.npz")["dev_cleaned"]
-
-    test_data = np.load("Test_data.npz")["test_data"]
     test_cleaned = np.load("Test_data.npz")["test_cleaned"]
 
     vocab = load_obj("vocab")
@@ -209,7 +212,6 @@ def vectorize_data(vec_cleaned, data_name): # training, dev, or test
         sys.stdout.flush()
     print()
     return X_vec, Y_vec, X_token
-
 
 X_train, Y_train, X_train_token = vectorize_data(train_cleaned, 'for train data')
 X_dev, Y_dev, X_dev_token = vectorize_data(dev_cleaned, 'for dev data')
