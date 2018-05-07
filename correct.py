@@ -63,10 +63,13 @@ X_test, X_src = vectorize_data(text_cleaned, 'for correction')
 
 model = load_model(PATH_MODEL)
 
-def decode_word(X, calc_argmax):
-    if calc_argmax:
-        X = X.argmax(axis=-1)
-    return ' '.join(id2vocab[x] for x in X)
+print("THIS is X in decode word : ", X)
+print("calc_argmax is set to : ", calc_argmax)
+if calc_argmax:
+    X = X.argmax(axis=-1)
+    print("This is the look of X now : ", X)
+print("This is the return : ", ' '.join(id2vocab[x] for x in X))
+return ' '.join(id2vocab[x] for x in X)
 
 correction = open(PATH_CORRECTION, 'w')
 
