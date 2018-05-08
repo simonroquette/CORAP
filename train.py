@@ -10,7 +10,6 @@ import numpy as np
 import six
 import csv
 import pickle
-import nltk.tokenize.casual
 
 import binarize
 from constants import *
@@ -23,18 +22,18 @@ from keras.regularizers import l1_l2
 
 ### path for data (for example)
 # DEV : validation set
-PATH_TRAIN = './data/SHORT.ptb.train.txt'
+PATH_TRAIN = './data/ptb.train.txt'
 PATH_DEV = './data/ptb.valid.txt'
 PATH_TEST = './data/ptb.test.txt'
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--epoch', '-e', default=20, type=int,
     help='number of epochs to learn')
-parser.add_argument('--unit', '-u', default=650, type=int,
+parser.add_argument('--unit', '-u', default=DEFAULT_N_UNITS, type=int,
     help='number of units in hidden layers')
-parser.add_argument('--batchsize', '-b', type=int, default=20,
+parser.add_argument('--batchsize', '-b', type=int, default=DEFAULT_BATCHSIZE,
     help='learning minibatch size')
-parser.add_argument('--checkpoint', '-c', type=int, default=5,
+parser.add_argument('--checkpoint', '-c', type=int, default=DEFAULT_CHECKPOINT,
     help='checkpoint for saving the model (# of epoch)')
 parser.add_argument('--noise', '-n', default="OCR",
     help='noise type (JUMBLE, INSERT, DELETE, REPLACE, RANDOM, OCR)')
@@ -92,28 +91,13 @@ def colors(token, color='green'):
    c_close = '\033[0m' # close
    return c_green + token + c_close
 
-def tokenize_string(str): # Not used
-    words = []
-    word = ""
-    for c in str:
-        if c in " .,:;'*!?`$%&(){}[]-/\@_#\"\n" :
-            if word != "":
-                words.append(word)
-                if c == "\n":
-                    words.append("<eos>")
-                elif c != " " :
-                    words.append(c)
-                word = ""
-        else:
-            word = word + c.lower()
-    return words
-
 
 def load_data(filename):
     global vocab
 
     word_counter = dict()
-    words = nltk.tokenize.casual.casual_tokenize(open(PATH_TRAIN, "r").read().replace("\n", "<eos>"), preserve_case = False)
+    words = my_tokenize(open(filename, "r").read())
+
     for w in words:
         if w in word_counter:
             word_counter[w] += 1
@@ -132,14 +116,16 @@ def load_data(filename):
     id2vocab[vocab["##&&(())!!!??"]] = "##&&(())!!!??"
     return words
 
-def decode_word(X, calc_argmax):
-    print("THIS is X in decode word : ", X)
-    print("calc_argmax is set to : ", calc_argmax)
+def decode_word(X, src, calc_argmax):
     if calc_argmax:
         X = X.argmax(axis=-1)
-        print("This is the look of X now : ", X)
-    print("This is the return : ", ' '.join(id2vocab[x] for x in X))
-    return ' '.join(id2vocab[x] for x in X)
+    result = []
+    for i in range(len(X)):
+        if X[i] == ID_UNKNOWN_WORD:
+            result.append(src[i])
+        else:
+            result.append(id2vocab[X[i]])
+    return result
 
 
 # NB. # is <eos>, _ is <unk>, @ is number
@@ -199,7 +185,15 @@ def vectorize_data(vec_cleaned, data_name): # training, dev, or test
                 x_mini_batch[j], x_token = binarize.jumble_char(token, jumble_type, alph)
 
             bin_label = [0]*len(vocab)
-            bin_label[vocab[token]] = 1
+
+            print("Token : ", token)
+            if token in vocab.keys():
+                print("it is in vocab")
+                bin_label[vocab[token]] = 1
+            else:
+                print("UNKNON WORD SEEN HERE ")
+                bin_label[ID_UNKNOWN_WORD] = 1
+
             y_mini_batch[j] = np.array(bin_label)
             X_token_m.append(x_token)
         X_vec[m] = x_mini_batch
@@ -266,24 +260,22 @@ for epoch_i in range(1, n_epoch+1):
 
         # check output
         for j in range(5):
-            x_raw, y_raw = X_dev[np.array([j])], Y_dev[np.array([j])]
-            src_j = " ".join(X_dev_token[j])
-            ref_j = decode_word(y_raw[0], calc_argmax=True)
+            x_raw, y_raw = X_test[np.array([j])], Y_test[np.array([j])]
+            src_j = " ".join(X_test_token[j])
+            ref_j = decode_word(y_raw[0], X_test_token[j], calc_argmax=True)
             preds = model.predict_classes(x_raw, verbose=0)
-            pred_j = decode_word(preds[0], calc_argmax=False)
-
+            pred_j = decode_word(preds[0], X_test_token[j], calc_argmax=False)
             # coloring
-            pred_j_list = pred_j.split()
-            ref_j_list = ref_j.split()
-            for k in range(len(pred_j_list)):
-                if pred_j_list[k] == ref_j_list[k]:
-                    pred_j_list[k] = colors(pred_j_list[k])
-            pred_j = " ".join(pred_j_list)
+            for k in range(len(pred_j)):
+                mots += 1
+                if pred_j[k] == ref_j[k]:
+                    corrects += 1
+                    pred_j[k] = colors(pred_j[k])
 
             print('example #', str(j+1))
             print('src: ', src_j)
-            print('prd: ', pred_j)
-            print('ref: ', ref_j)
+            print('prd: ', " ".join(pred_j))
+            print('ref: ', " ".join(ref_j))
 
 print("===== TRAINING FINISHED =====")
 

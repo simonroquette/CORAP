@@ -28,12 +28,12 @@ if SOURCE_TEXT == "":
 
 OUTPUT_WORDS = [""]
 
-text_cleaned = SOURCE_TEXT.replace('\n', ' <eos>').lower().strip().split()
+text_cleaned = my_tokenize(SOURCE_TEXT)
 
 print("\n")
 
 for w in text_cleaned:
-    if(mistake_happen()):
+    if True: # mistake_happen() if want to make errors not all the time
         rnd_noise = random.choice(['DELETE', 'INSERT', 'REPLACE', 'REPLACETABLE', 'REPLACETABLE']) #MAKE REPLACETABLE MORE PROBABLE
         token, w = binarize.noise_char(w, rnd_noise, alph)
 

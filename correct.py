@@ -27,7 +27,7 @@ text = args.text
 
 PATH_CORRECTION = "correction.txt"
 
-PATH_MODEL = "models/model_92%.h5"
+PATH_MODEL = "models/model_82%.h5"
 PATH_VOCAB = "models/vocab"
 PATH_ID2VOCAB = "models/id2vocab"
 
@@ -41,9 +41,10 @@ id2vocab = load_obj(PATH_ID2VOCAB)
 text_cleaned = ""
 
 if text == "":
-    text_cleaned = open(PATH_FILE).read().replace('\n', ' <eos>').lower().strip().split()
+    text_cleaned = open(PATH_FILE).read()
 else :
-    text_cleaned = text.replace('\n', ' <eos>').lower().strip().split()
+    text_cleaned = text
+text_cleaned = my_tokenize(text_cleaned)
 
 def vectorize_data(vec_cleaned, data_name): # training, dev, or test
     X_vec = np.zeros((int(len(vec_cleaned)/batchsize), batchsize, data_dim), dtype=np.bool)
@@ -71,13 +72,16 @@ X_test, X_src = vectorize_data(text_cleaned, 'for correction')
 
 model = load_model(PATH_MODEL)
 
-print("THIS is X in decode word : ", X)
-print("calc_argmax is set to : ", calc_argmax)
-if calc_argmax:
-    X = X.argmax(axis=-1)
-    print("This is the look of X now : ", X)
-print("This is the return : ", ' '.join(id2vocab[x] for x in X))
-return ' '.join(id2vocab[x] for x in X)
+def decode_word(X, src, calc_argmax):
+    if calc_argmax:
+        X = X.argmax(axis=-1)
+    result = []
+    for i in range(len(X)):
+        if X[i] == ID_UNKNOWN_WORD:
+            result.append(src[i])
+        else:
+            result.append(id2vocab[X[i]])
+    return result
 
 correction = open(PATH_CORRECTION, 'w')
 
@@ -85,12 +89,14 @@ for j in range(len(X_test)):
     x_raw = X_test[np.array([j])]
     src_j = " ".join(X_src[j])
     preds = model.predict_classes(x_raw, verbose=0)
-    pred_j = decode_word(preds[0], calc_argmax=False)
+    pred_j = decode_word(preds[0], X_src[j], calc_argmax=False)
+
+    txt_pred = " ".join(pred_j)
 
     if not MUTE:
         print("src : ", src_j)
-        print("pred : ", pred_j)
+        print("pred : ", txt_pred)
     if text == "" :
-        correction.write(pred_j)
+        correction.write(txt_pred)
 
 correction.close()

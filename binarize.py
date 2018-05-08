@@ -60,24 +60,6 @@ def hasnum(w):
             return True
     return False
 
-
-# "a" = 97
-def shape_input(w) : # Not used
-    num = []
-
-    for c in w:
-        if(isalnum(c)):
-            if(c.isdigit()) :
-                num.append( 28 * 1000)
-            else :
-                num.append( (ord(c.lower())-ord("a")) * 1000) #to space them out
-        else :
-            num.append(30 * 1000)
-
-    return np.array(num)
-
-
-
 def noise_char(w, opt, alph):
 
     bin = [0] * len(alph) * MAX_WORD_LENGTH
@@ -85,8 +67,7 @@ def noise_char(w, opt, alph):
     if w == '<eos>':
         for i in range(MAX_WORD_LENGTH) :
             bin[(i+1)*len(alph) - 1] += 1
-    elif w == '<unk>': # Should be removed ???
-        #print("UNK here !!!!!!!!!!!!!!")
+    elif w == '<unk>':
         for i in range(MAX_WORD_LENGTH) :
             bin[(i+1)*len(alph) - 2] += 1
 
