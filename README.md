@@ -1,4 +1,4 @@
-#CORAP (Correction ORthographique par Apprentissage Profond)
+# CORAP (Correction ORthographique par Apprentissage Profond)
 
 Spelling correction based on Deep Learning
 
@@ -12,13 +12,13 @@ So here is a big thank you to the Johns Hopkins University team who wrote [this 
 
 If I had to start again today, I would rather start from nothing, as some parts of the code are not useful in my project. I didn't do so because I had no knowledge in deep learning at all when I started, see About me section for more info !
 
-#Contacts
+# Contacts
 
 simon.roquette@epfl.ch (student who wrote the code)
 claude.coulombe@gmail.com (Supervisor)
 michel.gagnon@polymtl.ca (Professor)
 
-#How to use
+# How to use
 
  - predict.py : To see performance on test data
 
@@ -36,7 +36,7 @@ Results will be stored in /data/errors.txt from /data/source.txt by default, but
 option -t to give a text in console
 option -c to see the noise in console only
 
-#Data generation
+# Data generation
 
 Because no big OCR texts with spelling mistakes and their correction exist to my knowledge (if you happen to know any good one, please contact me !), we take a correctly spelled text, and add noise to it in order to have training data. I build an OCR noise fonction based on typical mistakes I read on internet, and hard to read letters I saw on my friends' handwriting. There are kind of mistakes randomly added :
  - (20%) Random deletion of a letter
@@ -44,7 +44,7 @@ Because no big OCR texts with spelling mistakes and their correction exist to my
  - (20%) Random replacement of a letter by another (random one)
  - (40%) Replacement of a letter or sequence of letters by another one that looks alike (nn with m, u with v... see binarize.py EQUIVALENCE_TABLE for more details)
 
-#Model
+# Model
 
 ### What it is
 - CharRNN
@@ -56,6 +56,6 @@ Because no big OCR texts with spelling mistakes and their correction exist to my
 - For the moment model is set to ignore capital letters
 - Much more ;)
 
-#About me
+# About me
 
 My name is Simon Roquette, I am a french EPFL (Ecole Polytechnique Fédérale de Lausanne) student, who went on an exchange in Polytechnique Montreal where I made this work. My field of study is Communication Systems, and I recently specialized in Data Science. I only discovered natural language processing, artificial intelligence and deep learning through this project. This can explain why this it is not perfect at all, and I strongly encourage you to contact me if you have any question regarding my approach, my code or anything. Thank you for your consideration !
