@@ -24,15 +24,16 @@ If I had to start again today, I would rather start from nothing, as some parts 
 
 # How to use
 
- - _predict.py_ : To see performance on test data
+<ul>
+ <li>_predict.py_ : To see performance on test data</li>
 
- use option -m "PATH_TO_MODEL"
+ <ul>use option -m "PATH_TO_MODEL"</ul>
 
- - _correct.py_ : Corrects given file or text using a pre-trained model
+<li>_correct.py_ : Corrects given file or text using a pre-trained model</li>
 
-Change MODEL_PATH in code to use another model
-option -f to give file to correct
-option -t to correct the given text in console
+<ul>Change MODEL_PATH in code to use another model</ul>
+<ul>option -f to give file to correct</ul>
+<ul>option -t to correct the given text in console</ul>
 
 <li>_noise_generator.py_ : Generates noised text from a source, to see
 
@@ -40,6 +41,9 @@ option -t to correct the given text in console
 <ul>option -t to give a text in console </ul>
 <ul>option -c to see the noise in console only </ul>
 </li>
+
+</ul>
+
 # Data generation
 
 Because no big OCR texts with spelling mistakes and their correction exist to my knowledge (if you happen to know any good one, please contact me !), we take a correctly spelled text, and add noise to it in order to have training data. I build an OCR noise fonction based on typical mistakes I read on internet, and hard to read letters I saw on my friends' handwriting. There are 4 kind of mistakes randomly added :
