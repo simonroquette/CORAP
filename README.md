@@ -32,14 +32,14 @@ If I had to start again today, I would rather start from nothing, as some parts 
 <li><i>correct.py</i> : Corrects given file or text using a pre-trained model</li>
 
 <ul>Change MODEL_PATH in code to use another model</ul>
-<ul>option -f to give file to correct</ul>
-<ul>option -t to correct the given text in console</ul>
+<ul>option <i>-f</i> to give file to correct</ul>
+<ul>option <i>-t</i> to correct the given text in console</ul>
 
 <li><i>noise_generator.py</i> : Generates noised text from a source, to see
 
-<ul>Results will be stored in /data/errors.txt from /data/source.txt by default, but path can be specified with option <i>-f</i> <i>-s</i></ul>
-<ul>option <i>-t</i> to give a text in console </ul>
-<ul>option <i>-c</i> to see the noise in console only </ul>
+<ul>Results will be stored in /data/errors.txt from /data/source.txt by default, but path can be specified with option <i>-f</i>  <i>-s</i></ul>
+<ul>option <i>-t</i>  to give a text in console </ul>
+<ul>option <i>-c</i>  to see the noise in console only </ul>
 </li>
 
 </ul>
