@@ -1,3 +1,7 @@
+# WORK IN PROGRESS !
+
+This depository is not a finished work yet, and the functionalities mentionned below are not necessarily all available !
+
 # CORAP (Correction ORthographique par Apprentissage Profond)
 
 Spelling correction based on Deep Learning.
@@ -32,8 +36,8 @@ If I had to start again today, I would rather start from nothing, as some parts 
 <li><i>correct.py</i> : Corrects given file or text using a pre-trained model</li>
 
 <ul>Change MODEL_PATH in code to use another model</ul>
-<ul>option <i>-f</i> to give file to correct</ul>
-<ul>option <i>-t</i> to correct the given text in console</ul>
+<ul>option <i>-f</i>  to give file to correct</ul>
+<ul>option <i>-t</i>  to correct the given text in console</ul>
 
 <li><i>noise_generator.py</i> : Generates noised text from a source, to see
 
