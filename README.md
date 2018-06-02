@@ -34,28 +34,28 @@ Change MODEL_PATH in code to use another model
 option -f to give file to correct
 option -t to correct the given text in console
 
- - _noise_generator.py_ : Generates noised text from a source, to see
+<li>_noise_generator.py_ : Generates noised text from a source, to see
 
-Results will be stored in /data/errors.txt from /data/source.txt by default, but path can be specified with option -f -s
-option -t to give a text in console
-option -c to see the noise in console only
-
+<ul>Results will be stored in /data/errors.txt from /data/source.txt by default, but path can be specified with option -f -s</ul>
+<ul>option -t to give a text in console </ul>
+<ul>option -c to see the noise in console only </ul>
+</li>
 # Data generation
 
 Because no big OCR texts with spelling mistakes and their correction exist to my knowledge (if you happen to know any good one, please contact me !), we take a correctly spelled text, and add noise to it in order to have training data. I build an OCR noise fonction based on typical mistakes I read on internet, and hard to read letters I saw on my friends' handwriting. There are 4 kind of mistakes randomly added :
- - (20%) Random deletion of a letter
- - (20%) Random addition of a letter
- - (20%) Random replacement of a letter by another (random one)
- - (40%) Replacement of a letter or sequence of letters by another one that looks alike (**nn** with *m*, *u* with *v*... see binarize.py EQUIVALENCE_TABLE for more details)
+ - *(20%)* Random deletion of a letter
+ - *(20%)* Random addition of a letter
+ - *(20%)* Random replacement of a letter by another (random one)
+ - *(40%)* Replacement of a letter or sequence of letters by another one that looks alike (**nn** with **m**, **u** with **v**... see binarize.py EQUIVALENCE_TABLE for more details)
 
 # Model
 
 ### Results
 
 Because my code is not supposed to only see how well a deep learning model can correct mistakes, but to be a usable solution to spelling correction, there are therfore two kinds of mistakes
- - False positives (doesn't correct a word that has a spelling mistake, happens often when for example *an* is mapped to *a*)
+ - False positives (doesn't correct a word that has a spelling mistake, happens often when for example **an** is mapped to **a**)
  - True negative (corrects a word that didn't contain a spelling mistake)
- 
+
 It has an overall 94% accuracy, on my noise considering 1/3 word has a spelling mistake.
 
 ### What it is
@@ -64,7 +64,7 @@ It has an overall 94% accuracy, on my noise considering 1/3 word has a spelling 
 - Classification problem : dictionnary is fed with training data's words. Each word seen is mapped to the most probable output in the build dictionnary
 
 ### To do/improve
-- (improve) There is a probability that the word is unknown and it will be mapped to himself (useful for unknown first names etc...) To train the model to this, words that are only seen once or twice are withdrawn from the dictionnary
+- *(improve)* There is a probability that the word is unknown and it will be mapped to himself (useful for unknown first names etc...) To train the model to this, words that are only seen once or twice are withdrawn from the dictionnary
 - For the moment model is set to ignore capital letters
 - Much more ;)
 
