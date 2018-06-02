@@ -1,36 +1,40 @@
 # CORAP (Correction ORthographique par Apprentissage Profond)
 
-Spelling correction based on Deep Learning
+Spelling correction based on Deep Learning.
 
 This is a project I did for Professor Michel Gagnon, under the supervision of Claude Coulombe, in Polytechnique Montreal. I started in January 2018 and stopped working on it in May 2018.
 
 The aim of this project was to build a deep learning based program to correct spelling mistakes related to OCR noise (on handwritten texts). Claude Coulombe needed this for his own work, and I therefore had to build it as a usable tool, rather than simply showing interesting results and learning performances.
 
+## Inspiration
+
 As I didn't know anything about deep learning when I started, I decided to start on someone else's code, learn with it and then modify it to meet my specific requirements.
 
 So here is a big thank you to the Johns Hopkins University team who wrote [this article](https://arxiv.org/pdf/1608.02214.pdf), and a special thank you to Keisuke Sakaguchi who took the time to answer my questions ! I took their code and simply added/modified what I needed all along.
 
-If I had to start again today, I would rather start from nothing, as some parts of the code are not useful in my project. I didn't do so because I had no knowledge in deep learning at all when I started, see About me section for more info !
+The model is very closed to the one in the article, so take a look at it if you want a general idea ! The main difference is that my model is a CharRNN, rather than scRNN, meaning all characters are injected the same way in the LSTM units.
+
+If I had to start again today, I would rather start from nothing, as some parts of the code are not useful in my project. I didn't do so because, again, I had no knowledge in deep learning at first.
 
 # Contacts
 
-simon.roquette@epfl.ch (student who wrote the code)
-claude.coulombe@gmail.com (Supervisor)
-michel.gagnon@polymtl.ca (Professor)
+ - simon.roquette@epfl.ch (student who wrote the code)
+ - claude.coulombe@gmail.com (Supervisor)
+ - michel.gagnon@polymtl.ca (Professor)
 
 # How to use
 
- - predict.py : To see performance on test data
+ - _predict.py_ : To see performance on test data
 
  use option -m "PATH_TO_MODEL"
 
- - correct.py : Corrects given file or text using a pre-trained model
+ - _correct.py_ : Corrects given file or text using a pre-trained model
 
 Change MODEL_PATH in code to use another model
 option -f to give file to correct
 option -t to correct the given text in console
 
- - noise_generator.py : Generates noised text from a source, to see
+ - _noise_generator.py_ : Generates noised text from a source, to see
 
 Results will be stored in /data/errors.txt from /data/source.txt by default, but path can be specified with option -f -s
 option -t to give a text in console
@@ -42,17 +46,24 @@ Because no big OCR texts with spelling mistakes and their correction exist to my
  - (20%) Random deletion of a letter
  - (20%) Random addition of a letter
  - (20%) Random replacement of a letter by another (random one)
- - (40%) Replacement of a letter or sequence of letters by another one that looks alike (nn with m, u with v... see binarize.py EQUIVALENCE_TABLE for more details)
+ - (40%) Replacement of a letter or sequence of letters by another one that looks alike (*nn* with *m*, *u* with *v*... see binarize.py EQUIVALENCE_TABLE for more details)
 
 # Model
 
+### Results
+
+Because my code is not supposed to only see how well a deep learning model can correct mistakes, but to be a usable solution to spelling correction, there are therfore two kinds of mistakes
+ - False positives (doesn't correct a word that has a spelling mistake, happens often when for example *an* is mapped to *a*)
+ - True negative (corrects a word that didn't contain a spelling mistake)
+It has an overall 94% accuracy, on my noise considering 1/3 word has a spelling mistake.
+
 ### What it is
-- CharRNN
+- *CharRNN*
 - LSTM units stacked (didn't change it from the code I based my work on, except input shape)
-- Classification problem : dictionnary is fed with training data's words, and each word seen is mapped to the most probable output in the build dictionnary
+- Classification problem : dictionnary is fed with training data's words. Each word seen is mapped to the most probable output in the build dictionnary
 
 ### To do/improve
-- There is a probability that the word is unknown and it will be mapped to himself (useful for unknown first names etc...) To train the model to this, words that are only seen once or twice are withdrawn from the dictionnary
+- (improve) There is a probability that the word is unknown and it will be mapped to himself (useful for unknown first names etc...) To train the model to this, words that are only seen once or twice are withdrawn from the dictionnary
 - For the moment model is set to ignore capital letters
 - Much more ;)
 
