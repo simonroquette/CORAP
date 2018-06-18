@@ -9,7 +9,9 @@ DEFAULT_CHECKPOINT = 4
 # SHOULD REMOVE/ADD cap letter depending if model takes them in consideration
 #Having capital letters means when you see a word, should also add it's capital version to the dictionnary !!
 # ABCDEFGHIJKLMNOPQRSTUVWXYZ
-alph = " abcdefghijklmnopqrstuvwxyz0123456789.,:;'*!?`$%&(){}[]-/\@_#" #TODO Should space be part of our alphabet ??? probably if want deal spaced out words
+alph = "abcdefghijklmnopqrstuvwxyz0123456789 .,:;'*!?`$%&(){}[]-/\@_#" #TODO Should space be part of our alphabet ??? probably if want deal spaced out words
+
+# replacement_alph = "abcdefghijklmnopqrstuvwxyz0123456789"
 
 ID_UNKNOWN_WORD = -1
 
@@ -22,7 +24,7 @@ def my_tokenize(s) :
 MAX_WORD_LENGTH = 16
 data_dim = len(alph)*MAX_WORD_LENGTH
 
-MIN_OCCURENCES = 1 # The number of times a word must be seen in training to be considered as a vocabulary word
+MIN_OCCURENCES = 2 # The number of times a word must be seen in training to be considered as a vocabulary word
 
 DROPOUT_RATE_INPUT = 0.01
 DROPOUT_RATE = 0.5

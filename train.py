@@ -116,7 +116,7 @@ def load_data(filename):
     id2vocab[vocab["##&&(())!!!??"]] = "##&&(())!!!??"
     return words
 
-def decode_word(X, src, calc_argmax):
+def decode_word(X, src, calc_argmax): # X is a list of ID of words
     if calc_argmax:
         X = X.argmax(axis=-1)
     result = []
@@ -186,12 +186,9 @@ def vectorize_data(vec_cleaned, data_name): # training, dev, or test
 
             bin_label = [0]*len(vocab)
 
-            print("Token : ", token)
             if token in vocab.keys():
-                print("it is in vocab")
                 bin_label[vocab[token]] = 1
             else:
-                print("UNKNON WORD SEEN HERE ")
                 bin_label[ID_UNKNOWN_WORD] = 1
 
             y_mini_batch[j] = np.array(bin_label)
@@ -260,16 +257,14 @@ for epoch_i in range(1, n_epoch+1):
 
         # check output
         for j in range(5):
-            x_raw, y_raw = X_test[np.array([j])], Y_test[np.array([j])]
-            src_j = " ".join(X_test_token[j])
-            ref_j = decode_word(y_raw[0], X_test_token[j], calc_argmax=True)
+            x_raw, y_raw = X_dev[np.array([j])], Y_dev[np.array([j])]
+            src_j = " ".join(X_dev_token[j])
+            ref_j = decode_word(y_raw[0], X_dev_token[j], calc_argmax=True)
             preds = model.predict_classes(x_raw, verbose=0)
-            pred_j = decode_word(preds[0], X_test_token[j], calc_argmax=False)
+            pred_j = decode_word(preds[0], X_dev_token[j], calc_argmax=False)
             # coloring
             for k in range(len(pred_j)):
-                mots += 1
                 if pred_j[k] == ref_j[k]:
-                    corrects += 1
                     pred_j[k] = colors(pred_j[k])
 
             print('example #', str(j+1))

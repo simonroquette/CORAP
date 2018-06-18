@@ -27,7 +27,7 @@ text = args.text
 
 PATH_CORRECTION = "correction.txt"
 
-PATH_MODEL = "models/model_82%.h5"
+PATH_MODEL = "models/last_model.h5"
 PATH_VOCAB = "models/vocab"
 PATH_ID2VOCAB = "models/id2vocab"
 
